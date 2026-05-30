@@ -21,6 +21,7 @@ on:
 jobs:
   digest:
     name: Generate & Send Digest — Ishita
+    environment: production
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
