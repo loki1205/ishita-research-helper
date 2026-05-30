@@ -1,0 +1,81 @@
+name: Ishita
+
+on:
+  # Every Monday at 7:00 AM IST (01:30 UTC)
+  schedule:
+    - cron: "30 1 * * 1"
+
+  # Manual trigger from GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      mode_override:
+        description: "Override mode (smart / free / leave blank for .env default)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Dry run — fetch & rank but do NOT send email"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  digest:
+    name: Generate & Send Digest — Ishita
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Research Digest Agent
+        env:
+          # User profile
+          ABOUT_ME: ${{ secrets.ABOUT_ME }}
+          INTERESTS: ${{ secrets.INTERESTS }}
+
+          # Digest settings
+          PAPERS_PER_DIGEST: ${{ secrets.PAPERS_PER_DIGEST || '5' }}
+
+          # Mode — allow manual override via workflow_dispatch input
+          MODE: ${{ github.event.inputs.mode_override || secrets.MODE || 'free' }}
+
+          # Gemini (SMART mode)
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || 'gemini-2.0-flash' }}
+
+          # Sources
+          SOURCES: ${{ secrets.SOURCES || 'arxiv,semantic_scholar,openalex' }}
+          INCLUDE_PREPRINTS: ${{ secrets.INCLUDE_PREPRINTS || 'true' }}
+
+          # Email
+          EMAIL_PROVIDER: gmail
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
+
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "🔍 Running in DRY RUN mode — no email will be sent"
+            python run.py --dry-run --output digest_preview.html
+          else
+            python agent/main.py
+          fi
+
+      - name: Upload preview (dry run only)
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-preview
+          path: digest_preview.html
+          retention-days: 3
