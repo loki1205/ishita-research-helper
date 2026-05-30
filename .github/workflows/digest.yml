@@ -66,11 +66,11 @@ jobs:
           TO_EMAIL: ${{ secrets.TO_EMAIL }}
 
         run: |
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.dry_run }}" == "true" ]]; then
             echo "🔍 Running in DRY RUN mode — no email will be sent"
             python run.py --dry-run --output digest_preview.html
           else
-            python agent/main.py
+            python -m agent.main
           fi
 
       - name: Upload preview (dry run only)
