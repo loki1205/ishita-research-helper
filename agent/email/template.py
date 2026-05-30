@@ -25,9 +25,9 @@ MODE_CONFIGS = {
         "subject_prefix": "◈ Ishita · Research Digest",
     },
     "fallback": {
-        "badge": "⚠ FALLBACK MODE",
-        "badge_color": "#b45309",
-        "subject_prefix": "⚠ Ishita · Research Digest",
+        "badge": "◈ FREE MODE (FAILSAFE)",
+        "badge_color": "#555555",
+        "subject_prefix": "◈ Ishita · Research Digest",
     },
 }
 
