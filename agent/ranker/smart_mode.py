@@ -90,7 +90,7 @@ def rank(
             contents=prompt,
             config=types.GenerateContentConfig(
                 temperature=0.4,
-                max_output_tokens=2000,
+                max_output_tokens=8000,
                 response_mime_type="application/json"
             ),
         )
