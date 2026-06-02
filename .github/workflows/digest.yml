@@ -1,9 +1,8 @@
 name: Ishita
 
 on:
-  # Every Monday at 7:00 AM IST (01:30 UTC)
   schedule:
-    - cron: "30 1 * * 1"
+    - cron: "53 1 * * 4"
 
   # Manual trigger from GitHub Actions UI
   workflow_dispatch:
